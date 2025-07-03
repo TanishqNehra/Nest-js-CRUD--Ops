@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { Prisma } from '@prisma/client';
-
+import { EmployeeCreateDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { Role } from './employees.entity';
 
 
 @Controller('employees')
@@ -9,13 +10,13 @@ export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
   @Post()
-  create(@Body() createEmployeeDto: Prisma.EmployeeCreateInput) {
+  create(@Body(ValidationPipe) createEmployeeDto: EmployeeCreateDto) {
     return this.employeesService.create(createEmployeeDto);
   }
 
   @Get()
   findAll(@Query('role') role?: 'Intern' | 'Employee' | 'Manager') {
-    return this.employeesService.findAll(role);
+    return this.employeesService.findAll(role as Role);
   }
 
   @Get(':id')
@@ -24,7 +25,7 @@ export class EmployeesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmployeeDto: Prisma.EmployeeUpdateInput) {
+  update(@Param('id') id: string, @Body(ValidationPipe) updateEmployeeDto: UpdateEmployeeDto) {
     return this.employeesService.update(+id, updateEmployeeDto);
   }
 
